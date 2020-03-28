@@ -1,14 +1,11 @@
 package com.kevinx8;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
+
 
 
 public class WordSearchPuzzle {
@@ -25,17 +22,21 @@ public class WordSearchPuzzle {
 	}
 
 	public WordSearchPuzzle(String wordFile, int wordCount, int shortest, int longest) {
-		AtomicInteger i = new AtomicInteger();
-		AtomicBoolean use = new AtomicBoolean((int)(Math.random() * 2) == 1);
-		try (Stream<String> words = Files.lines(Paths.get(wordFile), StandardCharsets.UTF_8)) {
+		int i = 0;
+		boolean use = (int)(Math.random() * 2) == 1;
+		try {
+			ArrayList<String> words = new ArrayList<>(Files.readAllLines(Paths.get(wordFile)));
 			int randomfactor = (int) (Paths.get(wordFile).toFile().length() / 1024); //nice randomisation factor that scales with file size
-			words.forEach(word -> {
-				if (word.length() >= shortest && word.length() <= longest && i.get() < wordCount && use.get()) {
-					puzzleWords.add(word);
-					i.getAndIncrement();
+			for (String word : words) {
+				if (i >= wordCount) {
+					break;
 				}
-				use.set((int)(Math.random() * randomfactor) == 1);
-			});
+				if (word.length() >= shortest && word.length() <= longest && use) {
+					puzzleWords.add(word);
+					i++;
+				}
+				use = (int)(Math.random() * randomfactor) == 1;
+			}
 		} catch (IOException e) {
 			System.out.printf("File %s not found!\n",wordFile);
 			return;
@@ -142,27 +143,43 @@ public class WordSearchPuzzle {
 	private void generateWordSearchPuzzle() {
 		int Dimensions = (int) Math.sqrt(puzzleWords.toString().length() * 3);
 		puzzle = new char[Dimensions][Dimensions];
-		AtomicInteger direction = new AtomicInteger((int) (Math.random() * 4));
-		AtomicInteger row = new AtomicInteger((int) (Math.random() * Dimensions));
-		AtomicInteger col = new AtomicInteger((int) (Math.random() * Dimensions));
-		puzzleWords.forEach(word -> {
+		int direction = (int) (Math.random() * 4);
+		int row = (int) (Math.random() * Dimensions);
+		int col = (int) (Math.random() * Dimensions);
+		for (String word : puzzleWords) {
+			boolean even = word.length() % 2 == 0;
+			switch (direction / 2) {
+				case 0:
+					if (even) {
+						col = (int) (Math.random() * (Dimensions - word.length() + 1) + word.length()/2 - 1);
+					} else {
+						col = (int) (Math.random() * (Dimensions - word.length()) + word.length()/2);
+					}
+					break;
+				case 1:
+					if (even) {
+						row = (int) (Math.random() * (Dimensions - word.length() + 1) + word.length()/2 - 1);
+					} else {
+						row = (int) (Math.random() * (Dimensions - word.length()) + word.length()/2);
+					}
+			}
+			System.out.println(checkspace(direction, row, col, word, Dimensions));
 			boolean wordplaced = false;
 			while (!wordplaced) {
-				if (checkspace(direction.get(), row.get(), col.get(), word, Dimensions) && !Used(row.get(),col.get(),word.length(),direction.get())) {
-					Tracker.add(direction.get(), row.get(), col.get());
-					fillwords(direction.get(), row.get(), col.get(), word);
+				if (checkspace(direction, row, col, word, Dimensions) && !Used(row,col,word.length(),direction)) {
+					Tracker.add(direction, row, col);
+					fillwords(direction, row, col, word);
 					wordplaced = true;
 				}
-				direction.set((int) (Math.random() * 4));
-				row.set((int) (Math.random() * Dimensions));
-				col.set((int) (Math.random() * Dimensions));
+				direction = (int) (Math.random() * 4);
+				row = (int) (Math.random() * Dimensions);
+				col = (int) (Math.random() * Dimensions);
 			}
-		});
-		char[] alphabet = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+		}
 		for (int rowc=0; rowc < puzzle.length;rowc++) {
 			for (int colc=0; colc < puzzle[0].length;colc++) {
 				if (puzzle[rowc][colc] == '\0') {
-					puzzle[rowc][colc] = alphabet[(int) (Math.random() * 26)];
+					puzzle[rowc][colc] = (char) ('A' + (int) (Math.random() * 26));
 				}
 			}
 		}
