@@ -23,12 +23,12 @@ public class WordSearchPuzzle {
 
 	public WordSearchPuzzle(String wordFile, int wordCount, int shortest, int longest) {
 		int i = 0;
-		boolean use = (int)(Math.random() * 2) == 1;
+		boolean use = (int)(Math.random() * 2) == 1; //randomisation for words to avoid having the words picked in order
 		try {
 			ArrayList<String> words = new ArrayList<>(Files.readAllLines(Paths.get(wordFile)));
 			int randomfactor = (int) (Paths.get(wordFile).toFile().length() / 1024); //nice randomisation factor that scales with file size
 			for (String word : words) {
-				if (i >= wordCount) {
+				if (i >= wordCount) { //stops picking words if it's already picked the specified amount
 					break;
 				}
 				if (word.length() >= shortest && word.length() <= longest && use) {
@@ -67,9 +67,9 @@ public class WordSearchPuzzle {
 		for (int row= 0; row < puzzle.length;row++) {
 			printer.append("| "); //adds left padding
 			for (int col= 0; col < puzzle[0].length;col++) {
-				printer.append(puzzle[row][col]).append(" "); //adds the letters with spaces inbetween
+				printer.append(puzzle[row][col]).append(" "); //adds the letters with spaces in-between
 			}
-			printer.append("|\n"); //ads right padding then newlines
+			printer.append("|\n"); //adds right padding then newlines
 		}
 		return printer.toString();
 	}
@@ -139,7 +139,7 @@ public class WordSearchPuzzle {
 		int col = (int) (Math.random() * Dimensions);
 		for (String word : puzzleWords) {
 			boolean wordplaced = false;
-			while (!wordplaced) { //keeps trying to place the word and if it fails to picks a new area to place it until it's finally placed
+			while (!wordplaced) { //keeps trying to place the word and if it fails, it picks a new area to place it until it's finally placed
 				boolean even = word.length() % 2 == 0;
 				switch (direction / 2) {
 					case 0:
