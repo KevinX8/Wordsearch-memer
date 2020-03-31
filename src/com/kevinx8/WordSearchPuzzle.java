@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-
 
 
 public class WordSearchPuzzle {
@@ -16,9 +16,6 @@ public class WordSearchPuzzle {
 	public WordSearchPuzzle(List<String> userSpecifiedWords) {
 		puzzleWords = userSpecifiedWords;
 		generateWordSearchPuzzle();
-		// puzzle generation using user specified words
-            // The user passes in a list of words to be used
-            // for generating the word search grid.
 	}
 
 	public WordSearchPuzzle(String wordFile, int wordCount, int shortest, int longest) {
@@ -27,34 +24,23 @@ public class WordSearchPuzzle {
 		try {
 			ArrayList<String> words = new ArrayList<>(Files.readAllLines(Paths.get(wordFile)));
 			int randomfactor = (int) (Paths.get(wordFile).toFile().length() / 1024); //nice randomisation factor that scales with file size
-			for (String word : words) {
-				if (i >= wordCount) { //stops picking words if it's already picked the specified amount
-					break;
+			while (puzzleWords.size() < wordCount) { //if not enough words are used in the first iteration repeat until enough words used
+				for (String word : words) {
+					if (i >= wordCount) { //stops picking words if it's already picked the specified amount
+						break;
+					}
+					if (word.length() >= shortest && word.length() <= longest && use) {
+						puzzleWords.add(word);
+						i++;
+					}
+					use = (int) (Math.random() * randomfactor) == 1;
 				}
-				if (word.length() >= shortest && word.length() <= longest && use) {
-					puzzleWords.add(word);
-					i++;
-				}
-				use = (int)(Math.random() * randomfactor) == 1;
 			}
 		} catch (IOException e) {
 			System.out.printf("File %s not found!\n",wordFile);
 			return;
 		}
 		generateWordSearchPuzzle();
-		// puzzle generation using words from a file
-            // The user supplies the filename. In the file
-            // the words should appear one per line.
-            // The wordCount specifies the number of words
-            // to (randomly) select from the file for use in
-            // the puzzle.
-            // shortest and longest specify the shortest
-            // word length to be used and longest specifies
-            // the longest word length to be used.
-            // SO, using the words in the file randomly select
-            // wordCount words with lengths between shortest
-            // and longest.
-
 	}
 	public List<String> getWordSearchList() {
 		return puzzleWords;
@@ -124,7 +110,7 @@ public class WordSearchPuzzle {
 		while (incrementer < max) { //performs a check for space and returns true if the selected area is used
 			if (horizontal && puzzle[checkrow][incrementer] != '\0') { //checks left to right for horizontal
 				return true;
-			} else if (puzzle[incrementer][checkcol] != '\0') {
+			} else if (!horizontal && puzzle[incrementer][checkcol] != '\0') {
 				return true;
 			}
 			incrementer++;
@@ -133,6 +119,10 @@ public class WordSearchPuzzle {
 	}
 	private void generateWordSearchPuzzle() {
 		int Dimensions = (int) Math.sqrt(puzzleWords.toString().length() * 3); //used 3 as factor as anything lower did not give adequate dimensions
+		puzzleWords.sort(Comparator.comparing(String::length).reversed());
+		Dimensions = Math.max(puzzleWords.get(0).length(),Dimensions);
+		//if (puzzleWords.size() == 1) {Dimensions = puzzleWords.get(0).length();}
+		//if (puzzleWords.size() == 2) {Dimensions = Math.max(puzzleWords.get(0).length(),puzzleWords.get(1).length());}
 		puzzle = new char[Dimensions][Dimensions];
 		int direction = (int) (Math.random() * 4);
 		int row = (int) (Math.random() * Dimensions); //sets initial values as for both cases these initial values would be within bounds for either the rows(horizontal) or columns
@@ -210,17 +200,4 @@ public class WordSearchPuzzle {
 			return HumanString;
 		}
 	}
-
-      // The dimensions of the puzzle grid should be set
-      // by summing the lengths of the words being used in the
-      // puzzle and multiplying the sum by 1.5 or 1.75
-      // or some other (appropriate) scaling factor to
-      // ensure that the grid will have enough additional
-      // characters to obscure the puzzle words. Once
-      // you have calculated how many characters you are
-      // going to have in the grid you can calculate the
-      // grid dimensions by getting the square root (rounded up)
-      // of the character total.
-	//
-      // You will also need to add the methods specified below
 }
