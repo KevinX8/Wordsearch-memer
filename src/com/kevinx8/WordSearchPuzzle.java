@@ -118,7 +118,7 @@ public class WordSearchPuzzle {
 		return false;
 	}
 	private void generateWordSearchPuzzle() {
-		int Dimensions = (int) Math.sqrt(puzzleWords.toString().length() * 3); //used 3 as factor as anything lower did not give adequate dimensions
+		int Dimensions = (int) Math.sqrt(puzzleWords.toString().length() * 1.5);
 		puzzleWords.sort(Comparator.comparing(String::length).reversed());
 		Dimensions = Math.max(puzzleWords.get(0).length(),Dimensions);
 		//if (puzzleWords.size() == 1) {Dimensions = puzzleWords.get(0).length();}
