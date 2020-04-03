@@ -1,5 +1,5 @@
 package com.kevinx8;
-
+//Paulis Gributs 19250568
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,7 +10,7 @@ public class WordSearchPuzzleDriver {
         ExampleArray();
         Breaker();
         long finish = System.currentTimeMillis();
-        System.out.println((finish - start) + " ms");
+        System.out.println("Completed in " + (finish - start) + " ms");
     }
     public static void ExampleFile() {
         System.out.println("Generating Puzzle using BasicEnglish.txt with 10 words and 15 letters as longest with solutions hidden");
