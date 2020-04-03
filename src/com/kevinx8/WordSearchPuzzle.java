@@ -29,7 +29,7 @@ public class WordSearchPuzzle {
 					if (i >= wordCount) { //stops picking words if it's already picked the specified amount
 						break;
 					}
-					if (word.length() >= shortest && word.length() <= longest && use) {
+					if (word.length() >= shortest && word.length() <= longest && use && puzzleWords.indexOf(word) == -1) { //checks if words are within limits and if they have already been added or not
 						puzzleWords.add(word);
 						i++;
 					}
@@ -119,10 +119,8 @@ public class WordSearchPuzzle {
 	}
 	private void generateWordSearchPuzzle() {
 		int Dimensions = (int) Math.sqrt(puzzleWords.toString().length() * 1.5);
-		puzzleWords.sort(Comparator.comparing(String::length).reversed());
-		Dimensions = Math.max(puzzleWords.get(0).length(),Dimensions);
-		//if (puzzleWords.size() == 1) {Dimensions = puzzleWords.get(0).length();}
-		//if (puzzleWords.size() == 2) {Dimensions = Math.max(puzzleWords.get(0).length(),puzzleWords.get(1).length());}
+		puzzleWords.sort(Comparator.comparing(String::length).reversed()); //sorts by largest first to ensure all words can fit
+		Dimensions = Math.max(puzzleWords.get(0).length(),Dimensions); //makes sure the dimensions calculated are at-least as big as the size of the largest word
 		puzzle = new char[Dimensions][Dimensions];
 		int direction = (int) (Math.random() * 4);
 		int row = (int) (Math.random() * Dimensions); //sets initial values as for both cases these initial values would be within bounds for either the rows(horizontal) or columns
